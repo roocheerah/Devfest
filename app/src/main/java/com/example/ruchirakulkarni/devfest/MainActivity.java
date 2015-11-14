@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
                 Firebase myFirebaseRef = new Firebase("https://glowing-heat-4595.firebaseio.com/");
                 myFirebaseRef.child("root").setValue("adding root..");
                 myFirebaseRef.child("root2").setValue(" adding root2...");
+                myFirebaseRef.child("Jess").setValue("YAY IM ON!");
 
             }
         });
