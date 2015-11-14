@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 if (previousChildKey != null) {
                     mAdapter.add(previousChildKey + " " + message);
                 } else {
-                    mAdapter.add(username + " " + message);
+                    mAdapter.add(username + " " + message); 
                 }
                 mAdapter.notifyDataSetChanged();
             }
