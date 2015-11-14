@@ -1,5 +1,8 @@
 package com.example.ruchirakulkarni.devfest;
 
+import android.app.LauncherActivity;
+import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,48 +14,77 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import java.util.*;
+
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 
 public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> mAdapter;
     private ListView chatList;
     private Firebase myFirebaseRef;
     private List<String> chats;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        Intent intent = getIntent();
+
+        username = intent.getStringExtra(LogInActivity.USERNAME);
         chatList = (ListView) findViewById(R.id.list);
         chats = new ArrayList<>();
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, chats);
         chatList.setAdapter(mAdapter);
-        chats.add("hello");
-        chats.add("there");
+
+        //chats.add(username);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Firebase.setAndroidContext(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
+        myFirebaseRef = new Firebase("https://glowing-heat-4595.firebaseio.com/");
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                myFirebaseRef = new Firebase("https://glowing-heat-4595.firebaseio.com/");
                 Snackbar.make(view, "Adding to the database...", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                Chat chat = new Chat("Ruchira");
-                chat.enterChat("This is a test chat", myFirebaseRef);
-                updateListView();
+                Chat chat = new Chat(username);
+                chat.enterChat("This is a test", myFirebaseRef);
             }
+        });
+
+        myFirebaseRef.addChildEventListener(new ChildEventListener() {
+            // Retrieve new posts as they are added to the database
+            @Override
+            public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
+                String message = (String) snapshot.getValue();
+                if (previousChildKey != null) {
+                    mAdapter.add(previousChildKey + " " + message);
+                } else {
+                    mAdapter.add(username + " " + message);
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                System.out.print("changed to this text: " + s);
+            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
         });
     }
 
-    public void updateListView(){
 
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
