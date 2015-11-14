@@ -8,29 +8,50 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import java.util.*;
 import com.firebase.client.Firebase;
 
 public class MainActivity extends AppCompatActivity {
+    private ArrayAdapter<String> mAdapter;
+    private ListView chatList;
+    private Firebase myFirebaseRef;
+    private List<String> chats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+        chatList = (ListView) findViewById(R.id.list);
+        chats = new ArrayList<>();
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, chats);
+        chatList.setAdapter(mAdapter);
+        chats.add("hello");
+        chats.add("there");
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Firebase.setAndroidContext(this);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                myFirebaseRef = new Firebase("https://glowing-heat-4595.firebaseio.com/");
                 Snackbar.make(view, "Adding to the database...", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                Firebase myFirebaseRef = new Firebase("https://glowing-heat-4595.firebaseio.com/");
-                myFirebaseRef.child("root").setValue("adding root..");
-                myFirebaseRef.child("root2").setValue(" adding root2...");
-
+                Chat chat = new Chat("Ruchira");
+                chat.enterChat("This is a test chat", myFirebaseRef);
+                updateListView();
             }
         });
+    }
+
+    public void updateListView(){
+
     }
 
     @Override
